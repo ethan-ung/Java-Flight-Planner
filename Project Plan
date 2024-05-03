@@ -1,0 +1,14 @@
+Constraints: Use only arrays, linkedlists, and stacks provided by the default java library
+
+Plan:
+
+Create flight objects that contain a source city, destination city, travel time, and travel cost.
+
+Create a flight map object that contains a linked list of linked lists of flight objects wherein the outer list
+represents a source city and the inner list represents all flight objects that share the same source city.
+
+Add a method to the flight map that adds flights to the linked list of linked lists based on source city.
+
+Add a method to the flight map that uses a stack and Dijkstra's algorithm to find shortest past based on either distance or time.
+
+Use Scanner to get file input using Split method to separate into string objects.
