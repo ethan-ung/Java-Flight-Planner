@@ -75,11 +75,12 @@ class FlightDatabase { // FlightDatabase class to manage city and flight objects
         this.cities = new LinkedList<>(); // Linked list of cities
     }
 
-    public void addFlightDB(String source, String destination, double cost, int duration) { // Establish connection between two cities in the database
+    public void addFlightDB(String source, String destination, double cost, int duration) { // Add flight from source to destination
         City sourceCity = getOrCreateCity(source);
         sourceCity.addFlight(new Flight(source, destination, cost, duration));
-
-        City destCity = getOrCreateCity(destination);
+    
+        City destCity = getOrCreateCity(destination); // Add bidirectional flight from destination back to source
+        destCity.addFlight(new Flight(destination, source, cost, duration));
     }
 
     public LinkedList<Flight> getFlightsFromCity(String cityName) { // Retrieve all available flights from a city
