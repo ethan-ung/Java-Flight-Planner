@@ -1,7 +1,12 @@
+// Ethan Ung
+// CS 3345.502
+// Professor Khan
+// 4/21/2024
+
 import java.io.*;
 import java.util.*;
 
-class City {
+class City { // City class to keep track of cities and connected cities
     private String name;
     private LinkedList<Flight> flights;
 
@@ -21,9 +26,14 @@ class City {
     public String getName() {
         return name;
     }
+
+    @Override
+    public String toString() {
+        return "";
+    }
 }
 
-class Flight {
+class Flight { // Flight class to keep track of flights and costs
     private String source;
     private String destination;
     private double cost;
@@ -58,21 +68,21 @@ class Flight {
     }
 }
 
-class FlightDatabase {
+class FlightDatabase { // FlightDatabase class to manage city and flight objects in conjunction
     private LinkedList<City> cities;
 
     public FlightDatabase() {
-        this.cities = new LinkedList<>();
+        this.cities = new LinkedList<>(); // Linked list of cities
     }
 
-    public void addFlight(String source, String destination, double cost, int duration) {
+    public void addFlightDB(String source, String destination, double cost, int duration) { // Establish connection between two cities in the database
         City sourceCity = getOrCreateCity(source);
         sourceCity.addFlight(new Flight(source, destination, cost, duration));
 
         City destCity = getOrCreateCity(destination);
     }
 
-    public LinkedList<Flight> getFlightsFromCity(String cityName) {
+    public LinkedList<Flight> getFlightsFromCity(String cityName) { // Retrieve all available flights from a city
         LinkedList<Flight> flights = new LinkedList<>();
         for (City city : cities) {
             if (city.getName().equals(cityName)) {
@@ -83,7 +93,7 @@ class FlightDatabase {
         return flights;
     }
 
-    private City getOrCreateCity(String cityName) {
+    private City getOrCreateCity(String cityName) { // Helper method that adds city to the database if it does not already exist, otherwise retrieves existing city
         for (City city : cities) {
             if (city.getName().equals(cityName)) {
                 return city;
@@ -98,14 +108,14 @@ class FlightDatabase {
         return cities.size();
     }
 
-    public LinkedList<Flight> getFlightsFromCityIndex(int cityIndex) {
+    public LinkedList<Flight> getFlightsFromCityIndex(int cityIndex) { // Use get method of doubly LinkedLists to traverse from head and retrieve city by index
         if (cityIndex >= 0 && cityIndex < cities.size()) {
             return cities.get(cityIndex).getFlights();
         }
-        return new LinkedList<>(); // Return empty list if index is out of bounds
+        return new LinkedList<>();
     }
 
-    public LinkedList<String> getCityNames() {
+    public LinkedList<String> getCityNames() { // Get all city names from cities in the database
         LinkedList<String> cityNames = new LinkedList<>();
         for (City city : cities) {
             cityNames.add(city.getName());
@@ -116,7 +126,7 @@ class FlightDatabase {
 
 class DFS {
     private static FlightDatabase flightDatabase;
-    private static List<List<Flight>> allPaths;
+    private static List<List<Flight>> allPaths; // To be implemented as an ArrayList
 
     public static List<List<Flight>> findAllPaths(FlightDatabase db, String source, String destination) {
         flightDatabase = db;
@@ -124,9 +134,9 @@ class DFS {
         int sourceIndex = getCityIndex(source);
         int destIndex = getCityIndex(destination);
 
-        if (sourceIndex != -1 && destIndex != -1) {
-            boolean[] visited = new boolean[flightDatabase.getNumCities()];
-            Stack<PathState> stack = new Stack<>();
+        if (sourceIndex != -1 && destIndex != -1) { // Check for in-bounds before continuing
+            boolean[] visited = new boolean[flightDatabase.getNumCities()]; // Keep track of cities already visited so that cycles will not occur
+            Stack<PathState> stack = new Stack<>(); // Keep track of current path state
             stack.push(new PathState(sourceIndex));
 
             while (!stack.isEmpty()) {
@@ -154,7 +164,7 @@ class DFS {
         return allPaths;
     }
 
-    private static int getCityIndex(String cityName) {
+    private static int getCityIndex(String cityName) { // Use get method to traverse LinkedList and retrieve city
         LinkedList<String> cityNames = flightDatabase.getCityNames();
         for (int i = 0; i < cityNames.size(); i++) {
             if (cityNames.get(i).equals(cityName)) {
@@ -185,7 +195,7 @@ public class Flight_Planner {
     public static void main(String[] args) {
         FlightDatabase flightDatabase = new FlightDatabase();
 
-        try {
+        try { // Need try-catch block for scanner to function without error
             File file = new File("flight_data.dat");
             Scanner fileScanner = new Scanner(file);
             int numberOfFlights = Integer.parseInt(fileScanner.nextLine());
@@ -198,7 +208,7 @@ public class Flight_Planner {
                 double cost = Double.parseDouble(arrStrings[2]);
                 int timeCost = Integer.parseInt(arrStrings[3]);
 
-                flightDatabase.addFlight(source, destination, cost, timeCost);
+                flightDatabase.addFlightDB(source, destination, cost, timeCost);
             }
         } catch (FileNotFoundException e) {
             System.out.println("File not found");
@@ -210,21 +220,21 @@ public class Flight_Planner {
             Scanner fileScanner = new Scanner(file);
             int numberOfRequests = Integer.parseInt(fileScanner.nextLine());
 
-            // Reading flight data and populating the FlightDatabase
+            // Reading flight requests
             for (int i = 0; i < numberOfRequests; i++) {
                 String[] arrStrings = fileScanner.nextLine().split("\\|");
-                // Now we have the flight database populated, let's plan some flights
-                String sourceCity = arrStrings[0]; // Replace with actual source city name
-                String destinationCity = arrStrings[1]; // Replace with actual destination city name
-                char preference = arrStrings[2].charAt(0); // 'C' for cost, 'T' for time
+                
+                String sourceCity = arrStrings[0];
+                String destinationCity = arrStrings[1];
+                char preference = arrStrings[2].charAt(0);
 
                 List<List<Flight>> paths = DFS.findAllPaths(flightDatabase, sourceCity, destinationCity);
 
                 System.out.println("Paths from " + sourceCity + " to " + destinationCity + ":");
                 int pathCount = 0;
                 for (List<Flight> path : paths) {
-                    if (pathCount >= 3) {
-                        break; // Only show up to 3 paths
+                    if (pathCount >= 3) { // Max of three possible paths
+                        break;
                     }
 
                     pathCount++;
@@ -239,7 +249,7 @@ public class Flight_Planner {
                     }
 
                     System.out.println("Total Cost: $" + totalCost + ", Total Time: " + totalTime + " hrs");
-                    System.out.println(); // Blank line for separation
+                    System.out.println();
                 }
 
                 if (paths.isEmpty()) {
